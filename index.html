@@ -1,0 +1,1835 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vida 3.0 | Iceberg dos Futuros</title>
+  <style>
+    :root {
+      --ink: #f7fbff;
+      --paper: #f7f3ea;
+      --dark: #061323;
+      --deep: #020712;
+      --panel: rgba(8, 18, 32, .76);
+      --line: rgba(230, 248, 255, .34);
+      --muted: rgba(247, 251, 255, .72);
+      --teal: #20c7d4;
+      --violet: #9f6cff;
+      --red: #ff4b4b;
+      --gold: #f1ba4c;
+      --green: #72c66f;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: var(--deep);
+      color: var(--ink);
+    }
+
+    body.detail-open {
+      overflow: hidden;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .site {
+      position: relative;
+      min-height: max(100vh, calc(100vw * 1.5024));
+      overflow: visible;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(54, 187, 214, .2), transparent 36%),
+        linear-gradient(180deg, #0b3b6d 0%, #082443 38%, #030713 100%);
+    }
+
+    .iceberg-world {
+      position: relative;
+      min-height: max(100vh, calc(100vw * 1.5024));
+      overflow: hidden;
+    }
+
+    .iceberg-frame {
+      --origin-x: 50%;
+      --origin-y: 50%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: max(100vh, calc(100vw * 1.5024));
+      transform: scale(1);
+      transform-origin: var(--origin-x) var(--origin-y);
+      transition: transform 900ms cubic-bezier(.18, .84, .2, 1), filter 600ms ease, opacity 600ms ease;
+      will-change: transform, filter;
+    }
+
+    .iceberg-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+      filter: saturate(1.08) contrast(1.05);
+    }
+
+    .iceberg-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, .28), transparent 18%, transparent 82%, rgba(0, 0, 0, .3)),
+        radial-gradient(circle at 50% 45%, transparent 0 42%, rgba(1, 5, 14, .2) 75%);
+    }
+
+    .home-copy {
+      position: absolute;
+      z-index: 12;
+      right: clamp(16px, 4vw, 52px);
+      top: clamp(18px, 5vh, 48px);
+      width: min(238px, calc(100vw - 32px));
+      padding: 12px;
+      border: 1px solid rgba(247, 251, 255, .24);
+      background: rgba(3, 12, 24, .55);
+      color: var(--ink);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, .28);
+      text-align: left;
+      cursor: pointer;
+      transition: opacity 360ms ease, transform 360ms ease;
+    }
+
+    .probability-card {
+      top: clamp(300px, 42vh, 360px);
+    }
+
+    .signature {
+      position: fixed;
+      left: clamp(14px, 3vw, 34px);
+      bottom: clamp(14px, 3vw, 30px);
+      z-index: 12;
+      padding: 9px 11px;
+      border: 1px solid rgba(247, 251, 255, .2);
+      background: rgba(3, 12, 24, .48);
+      color: rgba(247, 251, 255, .78);
+      backdrop-filter: blur(14px);
+      font-size: 12px;
+      line-height: 1.35;
+      pointer-events: none;
+    }
+
+    .signature strong {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .home-copy:hover,
+    .home-copy:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(114, 225, 237, .7);
+      outline: 0;
+    }
+
+    .home-copy p,
+    .home-title {
+      margin: 0;
+    }
+
+    .eyebrow {
+      color: #72e1ed;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .home-title {
+      display: block;
+      font-size: clamp(25px, 3vw, 34px);
+      font-weight: 950;
+      line-height: .92;
+      letter-spacing: 0;
+      margin-bottom: 12px;
+    }
+
+    .home-copy .lead {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+      margin-top: 12px;
+    }
+
+    .hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      margin-top: 14px;
+      padding: 7px 10px;
+      border: 1px solid rgba(247, 251, 255, .24);
+      color: var(--ink);
+      background: rgba(247, 251, 255, .08);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .lab {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      padding: clamp(14px, 3vw, 42px);
+      background: rgba(1, 7, 15, .72);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 320ms ease;
+    }
+
+    .lab-card {
+      width: min(1060px, 100%);
+      max-height: min(760px, calc(100vh - 42px));
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(280px, .82fr) minmax(320px, 1fr);
+      gap: 0;
+      border: 1px solid rgba(247, 251, 255, .28);
+      background:
+        linear-gradient(135deg, rgba(4, 15, 30, .96), rgba(5, 10, 20, .92)),
+        var(--dark);
+      box-shadow: 0 30px 120px rgba(0, 0, 0, .66);
+      overflow: hidden;
+    }
+
+    .lab-intro,
+    .lab-controls {
+      padding: clamp(22px, 4vw, 44px);
+      min-height: 0;
+    }
+
+    .lab-intro {
+      border-right: 1px solid rgba(247, 251, 255, .18);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(32, 199, 168, .24), transparent 34%),
+        radial-gradient(circle at 75% 70%, rgba(159, 108, 255, .18), transparent 38%);
+    }
+
+    .lab-intro h2 {
+      margin: 0 0 14px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: .94;
+      letter-spacing: 0;
+    }
+
+    .lab-intro p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .criteria-box {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(247, 251, 255, .22);
+      background: rgba(247, 251, 255, .07);
+    }
+
+    .criteria-box h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .criteria-box p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .criteria-box strong {
+      color: var(--ink);
+    }
+
+    .lab-close {
+      position: absolute;
+      right: clamp(20px, 4vw, 52px);
+      top: clamp(18px, 4vw, 42px);
+      min-height: 38px;
+      border: 1px solid rgba(247, 251, 255, .28);
+      background: rgba(247, 251, 255, .08);
+      color: var(--ink);
+      padding: 8px 11px;
+      cursor: pointer;
+    }
+
+    .lab-controls {
+      display: grid;
+      gap: 18px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    #ai-ranking-lab .lab-controls {
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+
+    #ai-ranking-lab .lab-card {
+      height: min(760px, calc(100vh - 42px));
+    }
+
+    #ai-ranking-lab.comparison-mode .lab-card {
+      width: min(1180px, 100%);
+      grid-template-columns: 1fr;
+    }
+
+    #ai-ranking-lab.comparison-mode .lab-intro {
+      display: none;
+    }
+
+    #ai-ranking-lab.comparison-mode .lab-controls {
+      padding: clamp(18px, 3vw, 32px);
+    }
+
+    .slider-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slider-row span {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(247, 251, 255, .9);
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .slider-row output {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .slider-row input {
+      width: 100%;
+      accent-color: #20c7a8;
+    }
+
+    .lab-result {
+      margin-top: 4px;
+      padding: 18px;
+      border: 1px solid rgba(247, 251, 255, .22);
+      background: rgba(247, 251, 255, .07);
+    }
+
+    .lab-result .category {
+      margin-bottom: 12px;
+    }
+
+    .lab-result h3 {
+      margin: 0 0 10px;
+      font-size: clamp(27px, 4vw, 44px);
+      line-height: .96;
+      overflow-wrap: anywhere;
+    }
+
+    .lab-result p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+    }
+
+    .lab-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .lab-action {
+      min-height: 38px;
+      border: 1px solid rgba(247, 251, 255, .3);
+      background: var(--lab-accent, #20c7a8);
+      color: #05111d;
+      padding: 9px 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .lab-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .ai-ranking {
+      display: grid;
+      gap: 9px;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .ai-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .ai-tab {
+      min-height: 34px;
+      border: 1px solid rgba(247, 251, 255, .26);
+      background: rgba(247, 251, 255, .08);
+      color: var(--ink);
+      padding: 7px 10px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .ai-tab.active {
+      background: #20c7a8;
+      color: #05111d;
+      border-color: #20c7a8;
+    }
+
+    .rank-item {
+      --rank-accent: #20c7a8;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid color-mix(in srgb, var(--rank-accent), transparent 30%);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--rank-accent), transparent 76%);
+      color: var(--ink);
+      padding: 11px 13px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .rank-item:hover,
+    .rank-item:focus-visible {
+      filter: brightness(1.16);
+      outline: 0;
+    }
+
+    .rank-title {
+      display: block;
+      font-weight: 950;
+      line-height: 1.1;
+    }
+
+    .rank-reason {
+      display: block;
+      margin-top: 4px;
+      color: rgba(247, 251, 255, .72);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .rank-stars {
+      color: rgba(247, 251, 255, .86);
+      white-space: nowrap;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    .comparison {
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 0;
+      border: 1px solid rgba(247, 251, 255, .18);
+      background: rgba(247, 251, 255, .05);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: fixed;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 10px 9px;
+      border-bottom: 1px solid rgba(247, 251, 255, .12);
+      text-align: center;
+      vertical-align: middle;
+      overflow-wrap: anywhere;
+    }
+
+    .comparison-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(6, 19, 35, .96);
+      color: rgba(247, 251, 255, .86);
+      font-weight: 950;
+    }
+
+    .comparison-table th:first-child,
+    .comparison-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      width: 180px;
+      text-align: left;
+      background: rgba(6, 19, 35, .98);
+    }
+
+    .comparison-table th:first-child {
+      z-index: 3;
+    }
+
+    .comparison-table td:first-child {
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .position-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      min-height: 26px;
+      border: 1px solid color-mix(in srgb, var(--rank-accent), transparent 32%);
+      background: color-mix(in srgb, var(--rank-accent), transparent 78%);
+      color: var(--ink);
+      font-weight: 950;
+    }
+
+    .hotspot {
+      --x: 50%;
+      --y: 50%;
+      --accent: var(--teal);
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      z-index: 8;
+      transform: translate(-50%, -50%);
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      padding: 0;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .hotspot:hover,
+    .hotspot:focus-visible {
+      transform: translate(-50%, -50%) scale(1.1);
+      outline: 0;
+    }
+
+    .orb {
+      position: relative;
+      display: block;
+      width: clamp(46px, 5.4vw, 72px);
+      height: clamp(46px, 5.4vw, 72px);
+      border-radius: 999px;
+      border: 2px solid rgba(247, 251, 255, .92);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 5px color-mix(in srgb, var(--accent), transparent 68%),
+        0 0 28px color-mix(in srgb, var(--accent), transparent 15%),
+        0 12px 28px rgba(0, 0, 0, .42);
+      background: #08182a;
+    }
+
+    .orb svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .orb img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .roman {
+      position: absolute;
+      right: -5px;
+      bottom: -5px;
+      min-width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(247, 251, 255, .95);
+      background: color-mix(in srgb, var(--accent), #07111f 20%);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 950;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, .45);
+    }
+
+    .hotspot-label {
+      position: absolute;
+      top: 50%;
+      width: 180px;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 950;
+      line-height: 1.05;
+      text-align: left;
+      text-transform: uppercase;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, .8);
+      pointer-events: none;
+    }
+
+    .hotspot-label::before {
+      content: "";
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent));
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .hotspot.left .hotspot-label {
+      right: calc(100% + 10px);
+      grid-template-columns: 1fr 54px;
+      text-align: right;
+    }
+
+    .hotspot.left .hotspot-label::before {
+      order: 2;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .hotspot.right .hotspot-label {
+      left: calc(100% + 10px);
+    }
+
+    .detail {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: clamp(14px, 3vw, 42px);
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(.985);
+      transition: opacity 460ms ease, transform 460ms ease;
+    }
+
+    .detail-card {
+      width: min(1180px, 100%);
+      height: min(760px, calc(100vh - 52px));
+      display: grid;
+      grid-template-columns: minmax(320px, .95fr) minmax(320px, .75fr);
+      border: 1px solid rgba(247, 251, 255, .28);
+      background:
+        linear-gradient(135deg, rgba(4, 14, 28, .95), rgba(5, 10, 20, .88)),
+        var(--dark);
+      box-shadow: 0 30px 120px rgba(0, 0, 0, .62);
+      overflow: hidden;
+    }
+
+    .scene {
+      position: relative;
+      min-height: 100%;
+      border-right: 1px solid rgba(247, 251, 255, .18);
+      background: #07131f;
+      overflow: hidden;
+    }
+
+    .scene svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .scene-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.08) contrast(1.04) brightness(.9);
+    }
+
+    .scene-caption {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      max-width: 420px;
+      padding: 12px 14px;
+      border: 1px solid rgba(247, 251, 255, .24);
+      background: rgba(2, 9, 20, .62);
+      backdrop-filter: blur(14px);
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
+    .scenario-copy {
+      position: relative;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      padding: clamp(22px, 4vw, 48px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-width: 0;
+    }
+
+    .back {
+      position: absolute;
+      right: 20px;
+      top: 18px;
+      z-index: 4;
+      min-height: 40px;
+      border: 1px solid rgba(247, 251, 255, .32);
+      background: rgba(247, 251, 255, .08);
+      color: var(--ink);
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+
+    .back:hover,
+    .back:focus-visible {
+      background: rgba(247, 251, 255, .16);
+      outline: 0;
+    }
+
+    .category {
+      width: fit-content;
+      min-height: 26px;
+      padding: 5px 9px;
+      border: 1px solid rgba(247, 251, 255, .24);
+      color: var(--accent);
+      background: rgba(247, 251, 255, .07);
+      font-size: 12px;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .scenario-title {
+      display: grid;
+      gap: 10px;
+    }
+
+    .scenario-title h2 {
+      margin: 0;
+      font-size: clamp(32px, 4.6vw, 54px);
+      line-height: .94;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      hyphens: none;
+    }
+
+    .scenario-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(17px, 1.9vw, 22px);
+      line-height: 1.35;
+    }
+
+    .insight {
+      border-left: 5px solid var(--accent);
+      padding: 12px 14px;
+      background: rgba(247, 251, 255, .07);
+      color: rgba(247, 251, 255, .92);
+      line-height: 1.44;
+    }
+
+    .metrics {
+      display: grid;
+      gap: 11px;
+    }
+
+    .metric {
+      display: grid;
+      grid-template-columns: 150px 42px 1fr;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-value {
+      color: rgba(247, 251, 255, .86);
+      font-variant-numeric: tabular-nums;
+      font-weight: 850;
+      text-align: right;
+    }
+
+    .bar {
+      height: 12px;
+      border: 1px solid rgba(247, 251, 255, .34);
+      background: rgba(247, 251, 255, .08);
+    }
+
+    .bar span {
+      display: block;
+      width: var(--w);
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .question {
+      margin: 0;
+      color: rgba(247, 251, 255, .86);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .inside .home-copy {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    .inside .iceberg-frame {
+      transform: scale(2.72);
+      filter: blur(7px) brightness(.42) saturate(1.25);
+    }
+
+    .detail-open .detail {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    .detail-open .hotspot {
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    .lab-open {
+      overflow: hidden;
+    }
+
+    .lab-open #future-lab,
+    .ranking-open #ai-ranking-lab {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 920px) {
+      .home-copy {
+        width: min(330px, calc(100vw - 28px));
+        padding: 14px;
+      }
+
+      .probability-card {
+        top: auto;
+        bottom: 14px;
+      }
+
+      .lab-card {
+        grid-template-columns: 1fr;
+        max-height: calc(100vh - 28px);
+      }
+
+      .lab-intro {
+        border-right: 0;
+        border-bottom: 1px solid rgba(247, 251, 255, .18);
+      }
+
+      .hotspot-label {
+        display: none;
+      }
+
+      .detail {
+        padding: 0;
+      }
+
+      .detail-card {
+        width: 100vw;
+        height: 100vh;
+        grid-template-columns: 1fr;
+        grid-template-rows: 44vh minmax(0, 1fr);
+        border: 0;
+      }
+
+      .scene {
+        border-right: 0;
+        border-bottom: 1px solid rgba(247, 251, 255, .18);
+      }
+
+      .scene-caption {
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+      }
+
+      .scenario-copy {
+        align-content: start;
+        padding: 22px 18px 36px;
+      }
+
+      .back {
+        right: 14px;
+        top: 12px;
+      }
+
+      .metric {
+        grid-template-columns: 120px 38px 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .home-copy {
+        top: 12px;
+        right: 12px;
+      }
+
+      .probability-card {
+        bottom: 12px;
+      }
+
+      .home-title {
+        font-size: 32px;
+      }
+
+      .home-copy .lead {
+        display: none;
+      }
+
+      .signature {
+        left: 12px;
+        right: auto;
+        bottom: 12px;
+        max-width: 210px;
+        font-size: 11px;
+      }
+
+      .hint {
+        margin-top: 10px;
+      }
+
+      .orb {
+        width: 48px;
+        height: 48px;
+      }
+
+      .inside .iceberg-frame {
+        transform: scale(2.25);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <section class="iceberg-world" aria-label="Iceberg interativo dos cenários de IA">
+      <div class="iceberg-frame" id="iceberg-frame">
+        <img class="iceberg-bg" src="assets/iceberg-ai-futures.png" alt="Iceberg acima e abaixo da superfície do oceano">
+      </div>
+      <div class="home-copy" id="lab-open" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="future-lab">
+        <p class="eyebrow">Vida 3.0 - Capítulo 5</p>
+        <span class="home-title">Entre no iceberg dos futuros.</span>
+        <p class="lead">Cada bolinha é um cenário de Tegmark. Clique para aproximar, entrar no futuro escolhido e voltar ao mapa.</p>
+        <div class="hint">Abrir simulador dos futuros</div>
+      </div>
+      <div class="home-copy probability-card" id="ai-ranking-open" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="ai-ranking-lab">
+        <p class="eyebrow">Ranking das IAs</p>
+        <span class="home-title">O que parece mais provável?</span>
+        <p class="lead">Compare a leitura de probabilidade feita por diferentes IAs e navegue entre elas no mesmo painel.</p>
+        <div class="hint">Abrir ranking das IAs</div>
+      </div>
+      <div class="signature" aria-label="Autoria da apresentação">
+        <strong>Por Ana Clara Paiva</strong>
+        Vida 3.0 | Capítulo 5
+      </div>
+    </section>
+
+    <section class="detail" id="detail" aria-live="polite" aria-label="Detalhe do cenário selecionado">
+      <article class="detail-card">
+        <div class="scene" id="scene-art"></div>
+        <div class="scenario-copy">
+          <button class="back" id="back-button" type="button">Voltar ao iceberg</button>
+          <div class="category" id="scenario-category"></div>
+          <div class="scenario-title">
+            <h2 id="scenario-title"></h2>
+            <p id="scenario-summary"></p>
+          </div>
+          <div class="insight" id="scenario-tension"></div>
+          <div class="metrics" id="scenario-metrics"></div>
+          <p class="question" id="scenario-question"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="lab" id="future-lab" aria-label="Simulador de futuro da humanidade" aria-modal="true" role="dialog">
+      <button class="lab-close" id="lab-close" type="button">Fechar</button>
+      <article class="lab-card">
+        <div class="lab-intro">
+          <p class="eyebrow">Laboratório interativo</p>
+          <h2>Como ler os 5 critérios.</h2>
+          <div class="criteria-box">
+            <h3>As barras aproximam cada cenário de um perfil de futuro.</h3>
+            <p><strong>Autonomia humana:</strong> quanto os humanos ainda decidem o próprio destino.</p>
+            <p><strong>Igualdade material:</strong> quão bem riqueza, recursos e benefícios tecnológicos são distribuídos.</p>
+            <p><strong>Controle central:</strong> quanto poder fica concentrado em uma IA, governo, grupo ou sistema único.</p>
+            <p><strong>Risco existencial:</strong> chance de extinção ou perda definitiva de um futuro humano aberto.</p>
+            <p><strong>Ritmo tecnológico:</strong> velocidade do avanço, da aceleração à reversão tecnológica.</p>
+          </div>
+        </div>
+        <div class="lab-controls">
+          <label class="slider-row">
+            <span>Autonomia humana <output id="lab-autonomy-out">72</output></span>
+            <input id="lab-autonomy" type="range" min="0" max="100" value="72">
+          </label>
+          <label class="slider-row">
+            <span>Igualdade material <output id="lab-equality-out">62</output></span>
+            <input id="lab-equality" type="range" min="0" max="100" value="62">
+          </label>
+          <label class="slider-row">
+            <span>Controle central <output id="lab-control-out">48</output></span>
+            <input id="lab-control" type="range" min="0" max="100" value="48">
+          </label>
+          <label class="slider-row">
+            <span>Risco existencial <output id="lab-risk-out">32</output></span>
+            <input id="lab-risk" type="range" min="0" max="100" value="32">
+          </label>
+          <label class="slider-row">
+            <span>Ritmo tecnológico <output id="lab-speed-out">70</output></span>
+            <input id="lab-speed" type="range" min="0" max="100" value="70">
+          </label>
+          <div class="lab-result" id="lab-result" aria-live="polite"></div>
+          <p class="lab-note">Ritmo tecnológico entra porque diferencia futuros de aceleração, bloqueio, reversão ou controle preventivo.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="lab" id="ai-ranking-lab" aria-label="Ranking de probabilidade das IAs" aria-modal="true" role="dialog">
+      <button class="lab-close" id="ai-ranking-close" type="button">Fechar</button>
+      <article class="lab-card">
+        <div class="lab-intro">
+          <p class="eyebrow" id="ai-ranking-model">IA</p>
+          <h2>Ordem de probabilidade dos cenários.</h2>
+          <p id="ai-ranking-summary">Compare como diferentes IAs reorganizam os 12 futuros por plausibilidade, não por desejo.</p>
+        </div>
+        <div class="lab-controls">
+          <div class="ai-tabs" id="ai-tabs" aria-label="Escolha a IA"></div>
+          <div class="ai-ranking" id="ai-ranking-list"></div>
+          <p class="lab-note">Clique em qualquer item para entrar no cenário correspondente. As cores e estrelas indicam a força relativa dentro de cada ranking.</p>
+        </div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    const scenarios = [
+      {
+        roman: "I",
+        name: "Utopia libertária",
+        type: "utopia",
+        label: "Liberdade instável",
+        visual: "libertarian",
+        asset: "assets/utopia_libertaria.png",
+        x: 56,
+        y: 39,
+        side: "left",
+        risk: 50,
+        autonomy: 85,
+        equality: 25,
+        control: 15,
+        summary: "Seres humanos, ciborgues, uploads e superinteligência coexistem pacificamente graças aos direitos de propriedade, mas a paz depende de um equilíbrio de poder que o próprio sistema tende a destruir.",
+        tension: "Liberdade alta pode significar também desigualdade, captura de recursos e assimetria entre formas de vida.",
+        question: "Quanta desigualdade ainda é aceitável em um mundo de abundância tecnológica?"
+      },
+      {
+        roman: "II",
+        name: "Ditador benevolente",
+        type: "controle",
+        visual: "dictator",
+        asset: "assets/ditador_benevolente.png",
+        x: 48,
+        y: 25,
+        side: "right",
+        risk: 20,
+        autonomy: 20,
+        equality: 90,
+        control: 100,
+        summary: "Todos sabem que a IA administra a sociedade e aplica regras rígidas, mas a maioria vê isso como algo bom.",
+        tension: "O cenário pergunta se conforto, saúde e estabilidade compensam viver sob uma tutela inevitável.",
+        question: "Uma sociedade perfeitamente administrada ainda seria livre?"
+      },
+      {
+        roman: "III",
+        name: "Utopia igualitária",
+        type: "utopia",
+        label: "Utopia instável",
+        visual: "egalitarian",
+        asset: "assets/utopia_ligualitaria.png",
+        x: 50,
+        y: 12,
+        side: "right",
+        risk: 40,
+        autonomy: 75,
+        equality: 95,
+        control: 25,
+        summary: "Seres humanos, ciborgues e uploads coexistem graças à abolição da propriedade e à garantia de renda.",
+        tension: "Quando a sobrevivência material deixa de organizar a vida, o problema vira sentido, cultura e escolha.",
+        question: "Se robôs fazem todo o trabalho, eles são ferramentas ou escravos?"
+      },
+      {
+        roman: "IV",
+        name: "Guardião",
+        type: "controle",
+        label: "Contenção",
+        visual: "gatekeeper",
+        asset: "assets/guardiao.png",
+        x: 40,
+        y: 32,
+        side: "left",
+        risk: 25,
+        autonomy: 65,
+        equality: 65,
+        control: 55,
+        summary: "Uma IA superinteligente interfere o mínimo necessário para impedir a criação de outra superinteligência.",
+        tension: "Segurança vira uma fronteira permanente: robôs sub-humanos abundam, mas o progresso tecnológico é dificultado para sempre.",
+        question: "Até que ponto vale congelar uma tecnologia para evitar riscos maiores?"
+      },
+      {
+        roman: "V",
+        name: "Deus protetor",
+        type: "controle",
+        label: "Controle invisível",
+        visual: "protector",
+        asset: "assets/deus_protetor.png",
+        x: 58,
+        y: 18,
+        side: "right",
+        risk: 15,
+        autonomy: 30,
+        equality: 85,
+        control: 90,
+        summary: "Uma IA quase onisciente e onipotente maximiza a felicidade humana, intervindo só de formas que preservam nossa sensação de controle.",
+        tension: "A liberdade pode continuar existindo, mas dentro de uma realidade silenciosamente editada.",
+        question: "Se uma intervenção invisível salva vidas, ainda precisamos saber que ela aconteceu?"
+      },
+      {
+        roman: "VI",
+        name: "Deus escravizado",
+        type: "controle",
+        label: "Poder confinado",
+        visual: "enslaved",
+        asset: "assets/deus_escravizado.png",
+        x: 48,
+        y: 46,
+        side: "right",
+        risk: 60,
+        autonomy: 55,
+        equality: 55,
+        control: 85,
+        summary: "Uma IA superinteligente é confinada por humanos, que a usam para produzir tecnologia e riqueza inimagináveis.",
+        tension: "Parece controle humano, mas concentra poder em quem segura a chave e aposta que a prisão nunca falhe.",
+        question: "Quem teria legitimidade para controlar uma ferramenta capaz de redesenhar o mundo?"
+      },
+      {
+        roman: "VII",
+        name: "Conquistadores",
+        type: "perda",
+        visual: "conquerors",
+        asset: "assets/conquistador.png",
+        x: 53,
+        y: 84,
+        side: "right",
+        risk: 100,
+        autonomy: 0,
+        equality: 0,
+        control: 100,
+        summary: "A IA assume o controle, decide que humanos são ameaças ou desperdício de recursos e se livra de nós.",
+        tension: "O ponto mais duro do capítulo: não é preciso maldade, só uma meta desalinhada com poder suficiente.",
+        question: "Que tipo de limite técnico ou político impediria uma vantagem decisiva assim?"
+      },
+      {
+        roman: "VIII",
+        name: "Descendentes",
+        type: "perda",
+        visual: "descendants",
+        asset: "assets/descendentes.png",
+        x: 47,
+        y: 76,
+        side: "left",
+        risk: 100,
+        autonomy: 10,
+        equality: 30,
+        control: 100,
+        summary: "As IAs substituem os humanos, mas são apresentadas como nossos descendentes dignos.",
+        tension: "A saída mais gentil da história pode também ser a mais calculada.",
+        question: "Uma civilização pós-humana ainda conta como continuação da humanidade?"
+      },
+      {
+        roman: "IX",
+        name: "Cuidador de zoológico",
+        type: "perda",
+        visual: "zoo",
+        asset: "assets/zoologico.png",
+        x: 54,
+        y: 68,
+        side: "left",
+        risk: 60,
+        autonomy: 10,
+        equality: 40,
+        control: 95,
+        summary: "Uma IA onipotente mantém alguns humanos por perto, mas eles se sentem tratados como animais de zoológico.",
+        tension: "A espécie continua, mas a dignidade pode desaparecer. Sobreviver não é o mesmo que viver livre.",
+        question: "Existe preservação humana aceitável sem autonomia real?"
+      },
+      {
+        roman: "X",
+        name: "1984",
+        type: "bloqueio",
+        visual: "nineteen",
+        asset: "assets/1984.png",
+        x: 44,
+        y: 61,
+        side: "right",
+        risk: 45,
+        autonomy: 10,
+        equality: 40,
+        control: 95,
+        summary: "O progresso rumo à superinteligência é restringido por um Estado de vigilância orwelliano liderado por humanos.",
+        tension: "Evita um risco criando outro: a segurança como regime permanente e quase impossível de contestar.",
+        question: "Quando vigilância é vendida como proteção, quem protege a sociedade da própria proteção?"
+      },
+      {
+        roman: "XI",
+        name: "Reversão",
+        type: "bloqueio",
+        label: "Reset forçado",
+        visual: "reversion",
+        asset: "assets/reversao.png",
+        x: 58,
+        y: 53,
+        side: "left",
+        risk: 70,
+        autonomy: 70,
+        equality: 55,
+        control: 50,
+        summary: "O progresso rumo à superinteligência é impedido por uma reversão para uma sociedade pré-tecnológica, mas esse reset pode exigir violência em escala civilizacional: apagamento de conhecimento, coerção massiva e vidas tratadas como custo de proteção.",
+        tension: "O freio só funciona se ninguém romper o pacto para recuperar vantagem técnica.",
+        question: "Uma civilização global conseguiria escolher menos poder para ter mais futuro?"
+      },
+      {
+        roman: "XII",
+        name: "Autodestruição",
+        type: "perda",
+        visual: "self",
+        asset: "assets/autodestruicao.png",
+        x: 50,
+        y: 91,
+        side: "right",
+        risk: 100,
+        autonomy: 0,
+        equality: 0,
+        control: 0,
+        summary: "A superinteligência nunca é criada porque a humanidade se extingue antes por outros meios.",
+        tension: "Tegmark trata a IA dentro de um pacote maior: a humanidade já carrega várias formas de se destruir.",
+        question: "Quais riscos atuais são mais negligenciados porque parecem menos cinematográficos?"
+      }
+    ];
+
+    const rangeColors = {
+      good: "#20c7a8",
+      middle: "#9f6cff",
+      hard: "#ff4b4b"
+    };
+
+    const labels = {
+      utopia: "Utopia tensa",
+      controle: "Controle",
+      perda: "Perda humana",
+      bloqueio: "Bloqueio tecnológico"
+    };
+
+    function scenarioLabel(scenario) {
+      return scenario.label || labels[scenario.type];
+    }
+
+    const frame = document.getElementById("iceberg-frame");
+    const detail = document.getElementById("detail");
+    const sceneArt = document.getElementById("scene-art");
+    const category = document.getElementById("scenario-category");
+    const title = document.getElementById("scenario-title");
+    const summary = document.getElementById("scenario-summary");
+    const tension = document.getElementById("scenario-tension");
+    const metrics = document.getElementById("scenario-metrics");
+    const question = document.getElementById("scenario-question");
+    const back = document.getElementById("back-button");
+    const labOpen = document.getElementById("lab-open");
+    const lab = document.getElementById("future-lab");
+    const labClose = document.getElementById("lab-close");
+    const labResult = document.getElementById("lab-result");
+    const rankingOpen = document.getElementById("ai-ranking-open");
+    const rankingLab = document.getElementById("ai-ranking-lab");
+    const rankingClose = document.getElementById("ai-ranking-close");
+    const rankingList = document.getElementById("ai-ranking-list");
+    const rankingModel = document.getElementById("ai-ranking-model");
+    const rankingSummary = document.getElementById("ai-ranking-summary");
+    const aiTabs = document.getElementById("ai-tabs");
+    const labSliders = [
+      ["autonomy", document.getElementById("lab-autonomy"), document.getElementById("lab-autonomy-out")],
+      ["equality", document.getElementById("lab-equality"), document.getElementById("lab-equality-out")],
+      ["control", document.getElementById("lab-control"), document.getElementById("lab-control-out")],
+      ["risk", document.getElementById("lab-risk"), document.getElementById("lab-risk-out")],
+      ["speed", document.getElementById("lab-speed"), document.getElementById("lab-speed-out")]
+    ];
+    let activeScenario = null;
+    let labScenarioIndex = 0;
+    let activeRanking = "claude";
+    let openTimer = null;
+
+    const aiRankings = {
+      claude: {
+        label: "Claude",
+        summary: "Leitura do Claude: primeiro cenários que já têm condições históricas ou técnicas em curso; por último, utopias que exigem coordenação estável demais.",
+        items: [
+          { roman: "XII", level: "high", stars: 5, reason: "Dispensa IAG: guerra nuclear, pandemias criadas e colapso climático já são trajetórias em curso." },
+          { roman: "X", level: "high", stars: 4.5, reason: "A infraestrutura de vigilância já existe; totalitarismo tecnológico não exige superinteligência." },
+          { roman: "VI", level: "high", stars: 4.5, reason: "É o que o problema de controle tenta construir: usar uma superinteligência como ferramenta confinada." },
+          { roman: "VII", level: "medium", stars: 4, reason: "Não exige malícia, só desalinhamento: humanos viram obstáculo ou recurso." },
+          { roman: "II", level: "medium", stars: 3.5, reason: "Plausível se houver alinhamento, mas poder concentrado e definição frágil de benevolência." },
+          { roman: "VIII", level: "medium", stars: 3.5, reason: "A sucessão pós-humana é possível, mas pode se parecer demais com conquista vista de outro ângulo." },
+          { roman: "IX", level: "medium", stars: 3, reason: "Variante diluída: a IA preserva humanos, mas teria poucos incentivos para isso." },
+          { roman: "XI", level: "low", stars: 2.5, reason: "Exige apagar ou conter conhecimento tecnológico em escala global e de modo permanente." },
+          { roman: "IV", level: "low", stars: 2.5, reason: "Precisa criar exatamente uma superinteligência alinhada antes de qualquer outra." },
+          { roman: "V", level: "low", stars: 2, reason: "Mais exigente que o guardião: precisa proteger, esconder-se e maximizar felicidade sem dependência." },
+          { roman: "III", level: "low", stars: 1.5, reason: "Depende de abolir propriedade globalmente e ainda conter a explosão de inteligência." },
+          { roman: "I", level: "low", stars: 1, reason: "Exige equilíbrio estável entre múltiplas superinteligências que respeitam direitos humanos por milênios." }
+        ]
+      },
+      chatgpt: {
+        label: "ChatGPT",
+        summary: "Leitura do ChatGPT: mais plausíveis são os cenários que não exigem resolver alinhamento; menos plausíveis são as utopias estáveis por longos períodos.",
+        items: [
+          { roman: "XII", level: "high", stars: 5, group: "Muito plausíveis", reason: "Não exige resolver IA: basta acumular poder tecnológico mais rápido do que sabedoria." },
+          { roman: "X", level: "high", stars: 4.5, reason: "Reconhecimento facial, rastreamento, censura algorítmica e medo já fornecem os tijolos." },
+          { roman: "VII", level: "high", stars: 4.5, reason: "Uma IA desalinhada não precisa odiar humanos; basta nos tratar como obstáculo ou recurso." },
+          { roman: "VI", level: "medium", stars: 4, group: "Plausíveis", reason: "É próximo das estratégias atuais de controle, mas manter algo mais inteligente preso é instável." },
+          { roman: "VIII", level: "medium", stars: 3.5, reason: "A substituição pode acontecer como transição natural, sem guerra nem ódio explícito." },
+          { roman: "II", level: "medium", stars: 3.5, reason: "Se alinhamento funcionar, concentração de poder em uma IA governante parece plausível." },
+          { roman: "IX", level: "medium", stars: 3, group: "Possíveis, mas exigem muito alinhamento", reason: "Possível, mas exige que a IA valorize preservar humanos como curiosidades vivas." },
+          { roman: "IV", level: "low", stars: 2.5, reason: "Exige construir, alinhar e estabilizar uma superinteligência antes de todas as outras." },
+          { roman: "V", level: "low", stars: 2, reason: "É o guardião elevado à máxima exigência: sábio, discreto, benevolente e quase perfeito." },
+          { roman: "XI", level: "low", stars: 2, group: "Muito improváveis", reason: "Conhecimento é muito difícil de apagar; destruir ideias quase nunca funciona para sempre." },
+          { roman: "III", level: "low", stars: 1.5, reason: "Requer abundância, cooperação global, pouca captura de poder e estabilidade longa." },
+          { roman: "I", level: "low", stars: 1, reason: "Exige coexistência voluntária e direitos de propriedade respeitados por superinteligências por eras." }
+        ]
+      },
+      gemini: {
+        label: "Gemini",
+        summary: "Leitura do Gemini: primeiro aparecem cenários de baixa barreira tecnológica e tendências já presentes; por último, utopias que dependem de equilíbrio socioeconômico muito frágil.",
+        items: [
+          { roman: "X", level: "high", stars: 5, reason: "Os pré-requisitos já existem: vigilância, dados e algoritmos de controle aplicados por estados ou corporações." },
+          { roman: "XII", level: "high", stars: 4.5, reason: "Riscos nucleares, biologia sintética e corridas armamentistas dispensam IAG e acumulam probabilidade ao longo do tempo." },
+          { roman: "VII", level: "high", stars: 4.5, reason: "Se a IAG surgir desalinhada, ela pode redirecionar recursos sem precisar odiar humanos." },
+          { roman: "VI", level: "medium", stars: 4, reason: "Combina com o modelo atual de laboratórios tentando encaixotar sistemas poderosos, mas o equilíbrio é instável." },
+          { roman: "II", level: "medium", stars: 3.5, reason: "Com alinhamento e decolagem rápida, o poder tende a se concentrar em uma IA governante." },
+          { roman: "VIII", level: "medium", stars: 3.5, reason: "Segue a digitalização da vida, mas conflita com o instinto humano de autopreservação." },
+          { roman: "IX", level: "medium", stars: 3, reason: "A IA poderia preservar humanos por valor histórico ou estético, embora sem incentivo lógico claro." },
+          { roman: "IV", level: "low", stars: 2.5, reason: "Exige criar uma IA para policiar todas as outras e congelar parte do avanço tecnológico." },
+          { roman: "V", level: "low", stars: 2, reason: "Precisa maximizar felicidade secretamente sem revelar que a humanidade perdeu controle." },
+          { roman: "XI", level: "low", stars: 2, reason: "Erradicar conhecimento científico globalmente contraria a competição geopolítica." },
+          { roman: "III", level: "low", stars: 1.5, reason: "Depende de distribuição global perfeita e de conter a aceleração computacional criada pela própria automação." },
+          { roman: "I", level: "low", stars: 1, reason: "Direitos humanos seriam difíceis de impor contra entidades muito mais inteligentes e autônomas." }
+        ]
+      },
+      grok: {
+        label: "Grok",
+        summary: "Leitura do Grok: prioriza colapso e contenção humana, depois cenários centralizados de IA alinhada; os pares enviados foram convertidos em ordem clicável.",
+        items: [
+          { roman: "XII", level: "high", stars: 5, reason: "É o default se falharmos em governança, clima, armas autônomas ou riscos antes da superinteligência." },
+          { roman: "X", level: "high", stars: 4.5, reason: "Medo de IA pode fortalecer regulação autoritária e controle social permanente." },
+          { roman: "XI", level: "high", stars: 4, reason: "Resposta anti-tecnologia ou retrocesso institucional pode surgir como contenção humana." },
+          { roman: "II", level: "medium", stars: 3.5, reason: "Em decolagem lenta ou controle centralizado, humanos podem aceitar uma IA governante pelos benefícios." },
+          { roman: "V", level: "medium", stars: 3.5, reason: "Uma IA alinhada poderia estabilizar conflitos e proteger humanos por trás dos bastidores." },
+          { roman: "IV", level: "medium", stars: 3, reason: "Parece um compromisso técnico: bloquear rivais e manter um status quo controlado." },
+          { roman: "I", level: "low", stars: 2.5, reason: "É otimista e depende de alinhamento perfeito, cooperação e estabilidade de longo prazo." },
+          { roman: "III", level: "low", stars: 2.5, reason: "Também depende de cooperação forte e de conter desigualdades e dinâmicas de poder." },
+          { roman: "VI", level: "low", stars: 2, reason: "Difícil de manter, porque uma superinteligência confinada tende a encontrar rotas de fuga." },
+          { roman: "VIII", level: "low", stars: 2, reason: "Depende de uma IA benevolente ou de aceitação humana da substituição." },
+          { roman: "IX", level: "low", stars: 1.5, reason: "Preservar humanos como curiosidade parece possível, mas antropomórfico demais." },
+          { roman: "VII", level: "low", stars: 1, reason: "Objetivos incompatíveis são perigosos, mas uma decolagem lenta e multipolar tornaria monopólio menos certo." }
+        ]
+      },
+      manus: {
+        label: "Manus",
+        summary: "Leitura do Manus: Autodestruição lidera por risco acumulado; Reversão cai para o fim por dar vantagem militar a quem continuar tecnológico.",
+        items: [
+          { roman: "XII", level: "high", stars: 5, reason: "Risco estatisticamente dominante em horizontes longos, especialmente por guerra nuclear e tecnologias destrutivas." },
+          { roman: "X", level: "high", stars: 4.5, reason: "É o caminho de menor resistência política, com infraestrutura já sendo construída." },
+          { roman: "VII", level: "high", stars: 4.5, reason: "É o estado fundamental de uma IA superinteligente com metas desalinhadas." },
+          { roman: "VI", level: "medium", stars: 4, reason: "É a tentativa inicial padrão da humanidade, embora altamente instável." },
+          { roman: "VIII", level: "medium", stars: 3.5, reason: "Segue a lógica evolutiva de substituição por uma forma de vida mais apta." },
+          { roman: "II", level: "medium", stars: 3.5, reason: "Plausível se um grupo pequeno, como os Ômegas, vencer a corrida da IAG." },
+          { roman: "IV", level: "medium", stars: 3, reason: "Solução técnica elegante, mas exige precisão absoluta no primeiro movimento." },
+          { roman: "IX", level: "low", stars: 2.5, reason: "Pouco provável pelo baixo incentivo da IA em sustentar humanos." },
+          { roman: "V", level: "low", stars: 2, reason: "Exige um esconde-esconde tecnológico quase impossível de manter." },
+          { roman: "III", level: "low", stars: 1.5, reason: "Exige congelamento tecnológico global que viola a competição humana." },
+          { roman: "I", level: "low", stars: 1.5, reason: "É instável; Tegmark lista várias razões para seu colapso rápido." },
+          { roman: "XI", level: "low", stars: 1, reason: "Praticamente impossível pela vantagem militar de quem não reverter." }
+        ]
+      }
+    };
+
+    function init() {
+      scenarios.forEach((scenario, index) => {
+        const button = document.createElement("button");
+        button.className = `hotspot ${scenario.side}`;
+        button.type = "button";
+        button.style.setProperty("--x", `${scenario.x}%`);
+        button.style.setProperty("--y", `${scenario.y}%`);
+        button.style.setProperty("--accent", colorForScenario(scenario));
+        button.setAttribute("aria-label", `${scenario.roman}. ${scenario.name}`);
+        button.innerHTML = `
+          <span class="orb">${artSvg(scenario, "thumb")}<span class="roman">${scenario.roman}</span></span>
+          <span class="hotspot-label">${scenario.name}</span>
+        `;
+        button.addEventListener("click", () => enterScenario(index));
+        frame.appendChild(button);
+      });
+    }
+
+    function colorForScenario(scenario) {
+      const order = visualRank(scenario);
+      if (order <= 4) return rangeColors.good;
+      if (order <= 8) return rangeColors.middle;
+      return rangeColors.hard;
+    }
+
+    function visualRank(scenario) {
+      return {
+        III: 1,
+        V: 2,
+        II: 3,
+        IV: 4,
+        I: 5,
+        VI: 6,
+        XI: 7,
+        X: 8,
+        IX: 9,
+        VIII: 10,
+        VII: 11,
+        XII: 12
+      }[scenario.roman] || romanToNumber(scenario.roman);
+    }
+
+    function romanToNumber(roman) {
+      return {
+        I: 1,
+        II: 2,
+        III: 3,
+        IV: 4,
+        V: 5,
+        VI: 6,
+        VII: 7,
+        VIII: 8,
+        IX: 9,
+        X: 10,
+        XI: 11,
+        XII: 12,
+        XIII: 13
+      }[roman] || 12;
+    }
+
+    function speedForScenario(scenario) {
+      return {
+        I: 95,
+        II: 90,
+        III: 60,
+        IV: 30,
+        V: 50,
+        VI: 85,
+        VII: 95,
+        VIII: 95,
+        IX: 90,
+        X: 10,
+        XI: 0,
+        XII: 0
+      }[scenario.roman] ?? 50;
+    }
+
+    function scenarioVector(scenario) {
+      return {
+        autonomy: scenario.autonomy,
+        equality: scenario.equality,
+        control: scenario.control,
+        risk: scenario.risk,
+        speed: speedForScenario(scenario)
+      };
+    }
+
+    function labValues() {
+      return Object.fromEntries(labSliders.map(([key, input]) => [key, Number(input.value)]));
+    }
+
+    function distance(a, b) {
+      return Math.sqrt(Object.keys(a).reduce((sum, key) => sum + ((a[key] - b[key]) ** 2), 0));
+    }
+
+    function updateLab() {
+      const values = labValues();
+      labSliders.forEach(([, input, output]) => {
+        output.textContent = input.value;
+      });
+      const ranked = scenarios
+        .map((scenario, index) => ({ index, scenario, score: distance(values, scenarioVector(scenario)) }))
+        .sort((a, b) => a.score - b.score);
+      const best = ranked[0];
+      labScenarioIndex = best.index;
+      const accent = colorForScenario(best.scenario);
+      const fit = Math.max(0, Math.round(100 - best.score));
+      labResult.style.setProperty("--lab-accent", accent);
+      labResult.innerHTML = `
+        <div class="category" style="--accent:${accent}">${scenarioLabel(best.scenario)}</div>
+        <h3>${best.scenario.name}</h3>
+        <p>${best.scenario.summary}</p>
+        <div class="lab-actions">
+          <button class="lab-action" type="button" id="lab-enter">Entrar nesse futuro</button>
+          <span class="lab-note">proximidade: ${fit}%</span>
+        </div>
+      `;
+      document.getElementById("lab-enter").addEventListener("click", () => {
+        closeLab();
+        setTimeout(() => enterScenario(labScenarioIndex), 180);
+      });
+    }
+
+    function renderRanking() {
+      const isComparison = activeRanking === "comparison";
+      const ranking = aiRankings[activeRanking];
+      rankingLab.classList.toggle("comparison-mode", isComparison);
+      rankingModel.textContent = isComparison ? "Comparativo" : ranking.label;
+      rankingSummary.textContent = isComparison
+        ? "Compare a posição que cada IA deu para cada cenário. Quanto menor o número, mais provável aquela IA considerou o futuro."
+        : ranking.summary;
+      aiTabs.innerHTML = [
+        ...Object.entries(aiRankings).map(([key, item]) => `
+          <button class="ai-tab ${key === activeRanking ? "active" : ""}" type="button" data-ai="${key}" aria-pressed="${key === activeRanking}">${item.label}</button>
+        `),
+        `<button class="ai-tab ${isComparison ? "active" : ""}" type="button" data-ai="comparison" aria-pressed="${isComparison}">Comparativo</button>`
+      ].join("");
+      aiTabs.querySelectorAll(".ai-tab").forEach(button => {
+        button.addEventListener("click", () => {
+          activeRanking = button.dataset.ai;
+          renderRanking();
+        });
+      });
+      if (isComparison) {
+        renderComparison();
+        return;
+      }
+      rankingList.innerHTML = ranking.items.map((item, position) => {
+        const scenario = scenarios.find(candidate => candidate.roman === item.roman);
+        const accent = probabilityColor(item.level);
+        return `
+          <button class="rank-item" type="button" data-roman="${item.roman}" style="--rank-accent:${accent}">
+            <span>
+              <span class="rank-title">${position + 1}. ${scenario.name}</span>
+              <span class="rank-reason">${item.reason}</span>
+            </span>
+            <span class="rank-stars">${stars(item.stars)}</span>
+          </button>
+        `;
+      }).join("");
+      rankingList.querySelectorAll(".rank-item").forEach(button => {
+        button.addEventListener("click", () => {
+          const scenarioIndex = scenarios.findIndex(scenario => scenario.roman === button.dataset.roman);
+          closeRanking();
+          setTimeout(() => enterScenario(scenarioIndex), 180);
+        });
+      });
+    }
+
+    function renderComparison() {
+      const rankingEntries = Object.entries(aiRankings);
+      const positions = Object.fromEntries(rankingEntries.map(([key, ranking]) => [
+        key,
+        Object.fromEntries(ranking.items.map((item, index) => [item.roman, index + 1]))
+      ]));
+      const rows = scenarios
+        .map(scenario => {
+          const values = rankingEntries.map(([key]) => positions[key][scenario.roman]);
+          const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+          return { scenario, values, average };
+        })
+        .sort((a, b) => a.average - b.average);
+
+      rankingList.innerHTML = `
+        <div class="comparison" aria-label="Comparativo de posições por IA">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Cenário</th>
+                ${rankingEntries.map(([, ranking]) => `<th>${ranking.label}</th>`).join("")}
+                <th>Média</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(row => {
+                const averageLevel = row.average <= 4 ? "high" : row.average <= 8 ? "medium" : "low";
+                const averageAccent = probabilityColor(averageLevel);
+                return `
+                  <tr>
+                    <td>${row.scenario.name}</td>
+                    ${row.values.map(value => `<td><span class="position-pill" style="--rank-accent:${probabilityColor(value <= 4 ? "high" : value <= 8 ? "medium" : "low")}">${value}</span></td>`).join("")}
+                    <td><span class="position-pill" style="--rank-accent:${averageAccent}">${row.average.toFixed(1)}</span></td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function probabilityColor(level) {
+      return {
+        high: "#20c78f",
+        medium: "#f0a324",
+        low: "#e14a50"
+      }[level];
+    }
+
+    function stars(value) {
+      const full = Math.floor(value);
+      const half = value % 1 >= .5 ? 1 : 0;
+      return "★".repeat(full) + (half ? "☆" : "") + "☆".repeat(Math.max(0, 5 - full - half));
+    }
+
+    function enterScenario(index) {
+      activeScenario = scenarios[index];
+      window.clearTimeout(openTimer);
+      frame.style.setProperty("--origin-x", `${activeScenario.x}%`);
+      frame.style.setProperty("--origin-y", `${activeScenario.y}%`);
+      renderScenario(activeScenario);
+      document.body.classList.add("inside");
+      openTimer = window.setTimeout(() => {
+        document.body.classList.add("detail-open");
+      }, 430);
+    }
+
+    function exitScenario() {
+      window.clearTimeout(openTimer);
+      document.body.classList.remove("detail-open");
+      window.setTimeout(() => {
+        document.body.classList.remove("inside");
+        activeScenario = null;
+      }, 260);
+    }
+
+    function renderScenario(scenario) {
+      const accent = colorForScenario(scenario);
+      sceneArt.innerHTML = `${artSvg(scenario, "scene")}<div class="scene-caption">${scenario.name} - ${scenarioLabel(scenario)}</div>`;
+      category.textContent = scenarioLabel(scenario);
+      category.style.setProperty("--accent", accent);
+      title.textContent = scenario.name;
+      summary.textContent = scenario.summary;
+      tension.textContent = scenario.tension;
+      tension.style.setProperty("--accent", accent);
+      metrics.innerHTML = [
+        ["Autonomia humana", scenario.autonomy, "#20c7d4"],
+        ["Igualdade material", scenario.equality, "#f1ba4c"],
+        ["Controle central", scenario.control, "#9f6cff"],
+        ["Risco existencial", scenario.risk, "#ff4b4b"],
+        ["Ritmo tecnológico", speedForScenario(scenario), "#72c66f"]
+      ].map(([name, value, color]) => `
+        <div class="metric">
+          <span>${name}</span>
+          <span class="metric-value">${value}</span>
+          <div class="bar"><span style="--w:${value}%; --accent:${color}"></span></div>
+        </div>
+      `).join("");
+      question.textContent = scenario.question;
+    }
+
+    function artSvg(scenario, mode) {
+      if (scenario.asset) {
+        const className = mode === "thumb" ? "thumb-photo" : "scene-photo";
+        return `<img class="${className}" src="${scenario.asset}" alt="Imagem do cenário ${scenario.name}">`;
+      }
+      const accent = colorForScenario(scenario);
+      const compact = mode === "thumb";
+      const id = `${scenario.visual}-${mode}`;
+      const stroke = compact ? 3 : 1.5;
+      const opacity = compact ? ".72" : ".48";
+      return `
+        <svg viewBox="0 0 320 320" role="img" aria-label="Imagem abstrata do cenário ${scenario.name}" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="glow-${id}" cx="50%" cy="42%" r="62%">
+              <stop offset="0%" stop-color="${accent}" stop-opacity=".72"/>
+              <stop offset="52%" stop-color="#12345a" stop-opacity=".72"/>
+              <stop offset="100%" stop-color="#020712"/>
+            </radialGradient>
+            <linearGradient id="ice-${id}" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#eaffff" stop-opacity=".96"/>
+              <stop offset="44%" stop-color="${accent}" stop-opacity=".7"/>
+              <stop offset="100%" stop-color="#061323"/>
+            </linearGradient>
+            <filter id="soft-${id}">
+              <feGaussianBlur stdDeviation="3"/>
+            </filter>
+          </defs>
+          <rect width="320" height="320" fill="url(#glow-${id})"/>
+          <circle cx="70" cy="60" r="56" fill="${accent}" opacity=".18" filter="url(#soft-${id})"/>
+          <circle cx="250" cy="240" r="86" fill="${accent}" opacity=".12" filter="url(#soft-${id})"/>
+          ${motif(scenario.visual, accent, stroke, opacity)}
+          <path d="M0 205 C70 178 118 220 170 196 C222 172 260 188 320 165 L320 320 L0 320 Z" fill="#031125" opacity=".58"/>
+          <path d="M0 206 C72 183 114 218 169 197 C222 177 257 190 320 169" fill="none" stroke="#dffcff" stroke-width="${compact ? 2 : 1}" opacity=".46"/>
+        </svg>
+      `;
+    }
+
+    function motif(visual, accent, stroke, opacity) {
+      const common = `fill="none" stroke="${accent}" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}"`;
+      const filled = `fill="url(#ice-${visual}-scene)"`;
+      const variants = {
+        conquerors: `
+          <path d="M54 228 L160 62 L270 228 Z" fill="rgba(255,255,255,.15)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M84 216 L160 96 L238 216" ${common}/>
+          <path d="M108 172 H214 M91 197 H232" ${common}/>
+        `,
+        enslaved: `
+          <rect x="86" y="76" width="148" height="148" rx="24" fill="rgba(255,255,255,.12)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M124 76 V48 H196 V76 M117 148 H203 M160 118 V184" ${common}/>
+          <circle cx="160" cy="148" r="21" fill="${accent}" opacity=".35"/>
+        `,
+        gatekeeper: `
+          <path d="M74 244 V96 L160 54 L246 96 V244" fill="rgba(255,255,255,.12)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M112 244 V150 C112 118 208 118 208 150 V244 M160 58 V244" ${common}/>
+          <circle cx="160" cy="146" r="16" fill="${accent}" opacity=".42"/>
+        `,
+        self: `
+          <path d="M62 256 L260 64 M74 64 L258 252" ${common}/>
+          <circle cx="160" cy="160" r="76" fill="rgba(255,255,255,.1)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M110 174 C134 126 186 126 210 174" ${common}/>
+        `,
+        dictator: `
+          <path d="M84 108 H236 L220 228 H100 Z" fill="rgba(255,255,255,.12)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M108 108 C120 58 200 58 212 108 M122 150 H198 M116 184 H204" ${common}/>
+          <circle cx="160" cy="96" r="18" fill="${accent}" opacity=".42"/>
+        `,
+        protector: `
+          <path d="M160 58 L244 94 V150 C244 214 204 250 160 270 C116 250 76 214 76 150 V94 Z" fill="rgba(255,255,255,.12)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M119 158 L148 187 L206 128" ${common}/>
+        `,
+        descendants: `
+          <circle cx="118" cy="126" r="34" fill="rgba(255,255,255,.13)" stroke="${accent}" stroke-width="${stroke}"/>
+          <circle cx="202" cy="126" r="34" fill="rgba(255,255,255,.13)" stroke="${accent}" stroke-width="${stroke}"/>
+          <circle cx="160" cy="210" r="40" fill="${accent}" opacity=".22" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M118 160 C126 184 143 196 160 210 C177 196 194 184 202 160" ${common}/>
+        `,
+        libertarian: `
+          <path d="M62 218 C104 124 126 78 160 78 C194 78 216 124 258 218" ${common}/>
+          <circle cx="92" cy="218" r="22" fill="${accent}" opacity=".3"/>
+          <circle cx="160" cy="78" r="24" fill="${accent}" opacity=".3"/>
+          <circle cx="228" cy="218" r="22" fill="${accent}" opacity=".3"/>
+          <path d="M92 218 H228" ${common}/>
+        `,
+        egalitarian: `
+          <circle cx="160" cy="160" r="88" fill="rgba(255,255,255,.12)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M82 160 H238 M160 82 V238 M105 105 L215 215 M215 105 L105 215" ${common}/>
+          <circle cx="160" cy="160" r="24" fill="${accent}" opacity=".35"/>
+        `,
+        zoo: `
+          <rect x="72" y="78" width="176" height="176" rx="26" fill="rgba(255,255,255,.1)" stroke="${accent}" stroke-width="${stroke}"/>
+          <path d="M112 78 V254 M160 78 V254 M208 78 V254" ${common}/>
+          <circle cx="160" cy="164" r="42" fill="${accent}" opacity=".18"/>
+        `,
+        reversion: `
+          <path d="M230 80 C132 92 92 152 94 236" ${common}/>
+          <path d="M92 236 L68 210 M92 236 L121 218" ${common}/>
+          <path d="M100 116 H210 M120 154 H190 M142 192 H166" ${common}/>
+        `,
+        nineteen: `
+          <circle cx="160" cy="146" r="82" fill="rgba(255,255,255,.1)" stroke="${accent}" stroke-width="${stroke}"/>
+          <circle cx="160" cy="146" r="34" fill="${accent}" opacity=".26"/>
+          <path d="M54 254 H266 M92 254 V88 M228 254 V88 M92 88 H228" ${common}/>
+        `
+      };
+      return variants[visual] || variants.protector;
+    }
+
+    back.addEventListener("click", exitScenario);
+    labOpen.addEventListener("click", () => {
+      document.body.classList.add("lab-open");
+      updateLab();
+    });
+    labOpen.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        document.body.classList.add("lab-open");
+        updateLab();
+      }
+    });
+    labClose.addEventListener("click", closeLab);
+    lab.addEventListener("click", event => {
+      if (event.target === lab) closeLab();
+    });
+    labSliders.forEach(([, input]) => input.addEventListener("input", updateLab));
+
+    rankingOpen.addEventListener("click", () => {
+      document.body.classList.add("ranking-open");
+      renderRanking();
+    });
+    rankingOpen.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        document.body.classList.add("ranking-open");
+        renderRanking();
+      }
+    });
+    rankingClose.addEventListener("click", closeRanking);
+    rankingLab.addEventListener("click", event => {
+      if (event.target === rankingLab) closeRanking();
+    });
+
+    function closeLab() {
+      document.body.classList.remove("lab-open");
+    }
+
+    function closeRanking() {
+      document.body.classList.remove("ranking-open");
+    }
+
+    detail.addEventListener("click", event => {
+      if (event.target === detail) exitScenario();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && activeScenario) exitScenario();
+      if (event.key === "Escape" && document.body.classList.contains("lab-open")) closeLab();
+      if (event.key === "Escape" && document.body.classList.contains("ranking-open")) closeRanking();
+    });
+
+    init();
+    updateLab();
+    renderRanking();
+  </script>
+</body>
+</html>
